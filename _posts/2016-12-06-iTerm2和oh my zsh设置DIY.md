@@ -7,14 +7,16 @@ tag: 博客
 ---   
 
 　　iTerm2是非常好用的,要必须mac系统自带的终端好用的多,而且还能自己修改主题,让编写更清晰.
-　
+
+
 ## DIY过程     
 
 ### 首先下载iTerm2         
 
-```
-下载地址：http://www.iterm2.com
-```
+
+下载地址：[http://www.iterm2.com](url)
+
+
 打开iTerm2
 
 ### 安装oh-my-zsh
@@ -22,6 +24,7 @@ tag: 博客
 ```
 curl -L https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh | sh
 ```
+
 ### 安装Poweline
 
 在官网有教程，我们只需要执行官网第一条安装指令就行
@@ -31,18 +34,21 @@ curl -L https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh | 
 ```
 pip install powerline-status
 ```
+
 如果没有，则先执行安装pip指令
 
 ```
 sudo easy_install pip
 ```
 
-##下载,安装字体库
+## 下载,安装字体库
 
-```
-下载地址：https://github.com/powerline/fonts
-```
+
+下载地址：[https://github.com/powerline/fonts](url)
+
+
 ###将工程下载下来后cd到install.sh文件所在目录
+
 ###执行指令安装字体库
 
 执行./install.sh指令安装所有Powerline字体
@@ -63,7 +69,7 @@ All Powerline fonts installed to /Users/wangjinbao/Library/Fonts
 
 ###安装配色方案
 
-进入刚刚下载的工程的solarized/iterm2-colors-solarized 下双击 Solarized Dark.itermcolors 和 Solarized Light.itermcolors 两个文件就可以把配置文件导入到 iTerm2 里
+进入刚刚下载的工程的```solarized/iterm2-colors-solarized``` 下双击``` Solarized Dark.itermcolors``` 和 ```Solarized Light.itermcolors``` 两个文件就可以把配置文件导入到 iTerm2 里
 
 ###配置配色方案
 
@@ -74,7 +80,7 @@ All Powerline fonts installed to /Users/wangjinbao/Library/Fonts
 ##使用agnoster主题
 
 ###下载agnoster主题
-到下载的工程里面运行install文件,主题将安装到~/.oh-my-zsh/themes目录下
+到下载的工程里面运行install文件,主题将安装到```~/.oh-my-zsh/themes```目录下
 
 ###设置该主题
 进入~/.zshrc打开.zshrc文件，然后将ZSH_THEME后面的字段改为agnoster。ZSH_THEME="agnoster"（agnoster即为要设置的主题）
@@ -91,11 +97,13 @@ All Powerline fonts installed to /Users/wangjinbao/Library/Fonts
 ```
 git clone git://github.com/zsh-users/zsh-syntax-highlighting.git
 ```
+
 ##打开.zshrc文件，在最后添加下面内容
 
 ```
 source XXX/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 ```
+
 保存文件。
 
 注意：xxx代表.zshrc所在目录
@@ -107,8 +115,10 @@ source XXX/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 ```
 plugins=(zsh-syntax-highlighting)
 ```
+
 保存文件。
 
 
 文／SuperDanny（简书作者）
-转载地址http://www.jianshu.com/p/7de00c73a2bb 谢谢！
+
+转载地址[http://www.jianshu.com/p/7de00c73a2bb](url) 谢谢！
