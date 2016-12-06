@@ -47,9 +47,9 @@ sudo easy_install pip
 下载地址：[https://github.com/powerline/fonts](url)
 
 
-###将工程下载下来后cd到install.sh文件所在目录
+### 将工程下载下来后cd到install.sh文件所在目录
 
-###执行指令安装字体库
+### 执行指令安装字体库
 
 执行./install.sh指令安装所有Powerline字体
 
@@ -59,46 +59,46 @@ sudo easy_install pip
 All Powerline fonts installed to /Users/wangjinbao/Library/Fonts
 ```
 
-##设置iTerm 2的Regular Font 和 Non-ASCII Font
+## 设置iTerm 2的Regular Font 和 Non-ASCII Font
 
 安装完字体库之后，把iTerm 2的设置里的Profile中的Text 选项卡中里的Regular Font和Non-ASCII Font的字体都设置成 Powerline的字体，我这里设置的字体是12pt Meslo LG S DZ Regular for Powerline
 
 ![](/images/posts/iTerm2/设置iTerm2.png)
 
-##配色方案
+## 配色方案
 
-###安装配色方案
+### 安装配色方案
 
 进入刚刚下载的工程的```solarized/iterm2-colors-solarized``` 下双击``` Solarized Dark.itermcolors``` 和 ```Solarized Light.itermcolors``` 两个文件就可以把配置文件导入到 iTerm2 里
 
-###配置配色方案
+### 配置配色方案
 
 通过load presets选择刚刚安装的配色主题即可
 
 ![](/images/posts/iTerm2/配色方案.png)
 
-##使用agnoster主题
+## 使用agnoster主题
 
-###下载agnoster主题
+### 下载agnoster主题
 到下载的工程里面运行install文件,主题将安装到```~/.oh-my-zsh/themes```目录下
 
-###设置该主题
+### 设置该主题
 进入~/.zshrc打开.zshrc文件，然后将ZSH_THEME后面的字段改为agnoster。ZSH_THEME="agnoster"（agnoster即为要设置的主题）
 
 
-###增加指令高亮效果——zsh-syntax-highlighting
+### 增加指令高亮效果——zsh-syntax-highlighting
 
 指令高亮效果作用是当用户输入正确命令时指令会绿色高亮，错误时命令红色高亮
 
-##cd到.zshrc所在目录
+## cd到.zshrc所在目录
 
-##执行指令将工程克隆到当前目录
+## 执行指令将工程克隆到当前目录
 
 ```
 git clone git://github.com/zsh-users/zsh-syntax-highlighting.git
 ```
 
-##打开.zshrc文件，在最后添加下面内容
+## 打开.zshrc文件，在最后添加下面内容
 
 ```
 source XXX/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
@@ -108,9 +108,9 @@ source XXX/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 注意：xxx代表.zshrc所在目录
 
-###cd ~/.oh-my-zsh/custom/plugins
+### cd ~/.oh-my-zsh/custom/plugins
 
-###再次打开.zshrc文件，在最后面添加下面内容
+### 再次打开.zshrc文件，在最后面添加下面内容
 
 ```
 plugins=(zsh-syntax-highlighting)
