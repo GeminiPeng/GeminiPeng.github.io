@@ -1,0 +1,180 @@
+---
+
+layout: post
+title: "block对外部变量的内存管理"
+date: 2016-12-22 
+description: "介绍block对外部变量的管理机制"
+tag: iOS
+ 
+---
+
+###基本数据类型
+
+`
+//局部变量  
+- (void)localDataTest  
+{  
+    int localData = 100;  
+    NSLog(@"localData --%p",&localData);  
+    int (^sum)() = ^(int a,int b){  
+        NSLog(@"localData --%p",&localData);  
+        return localData + a + b;  
+    };  
+    localData = 0;  
+    int c = sum(1,2);  
+    NSLog(@"localDataTest -- c= %d",c);  
+} 
+
+`
+
+`
+打印结果：
+
+2015-03-21 12:04:11.161 test1[837:31981] localData --0xbfff4ed0
+
+2015-03-21 12:04:11.162 test1[837:31981] localData --0x7c18bb44
+
+2015-03-21 12:04:11.162 test1[837:31981] localDataTest --c = 103
+
+`
+
+---------
+
+`
+    //静态变量  
+    - (void)staticDataTest  
+    {  
+        static int staticData = 100;  
+        NSLog(@"staticData --%p",&staticData);  
+        int (^sum)() = ^(int a,int b){  
+            NSLog(@"staticData --%p",&staticData);  
+            return staticData + a + b;  
+        };  
+        staticData = 0;  
+        int c = sum(1,2);  
+        NSLog(@"staticDataTest --%d",c);  
+    }  
+
+`
+
+`
+打印结果：
+
+2015-03-21 12:04:11.162 test1[837:31981] staticData --0xc7b8
+
+2015-03-21 12:04:11.162 test1[837:31981] staticData --0xc7b8
+
+2015-03-21 12:04:11.162 test1[837:31981] staticDataTest-- 3
+
+`
+
+--------
+
+`
+    //全局变量  
+    - (void)globalDataTest  
+    {  
+        NSLog(@"globalData --%p",&globalData);  
+        int (^sum)() = ^(int a,int b){  
+            NSLog(@"globalData --%p",&globalData);  
+            return globalData + a + b;  
+        };  
+        globalData = 0;  
+        int c = sum(1,2);  
+        NSLog(@"globalData --%d",c);  
+    }  
+
+`
+
+`
+打印结果：
+
+2015-03-21 12:04:11.162 test1[837:31981] globalData --0xc7b4
+
+2015-03-21 12:04:11.162 test1[837:31981] globalData --0xc7b4
+
+2015-03-21 12:04:11.163 test1[837:31981] globalData -- 3
+
+`
+
+--------
+
+`
+    //block变量  
+    - (void)blockDataTest  
+    {  
+        __block int blockData = 100;  
+        NSLog(@"blockData --%p",&blockData);  
+        int (^sum)() = ^(int a,int b){  
+            NSLog(@"blockData --%p",&blockData);  
+            return blockData + a + b;  
+        };  
+        blockData = 0;  
+        int c = sum(1,2);  
+        NSLog(@"blockDataTest -- c= %d",c);  
+    }  
+
+`
+
+`
+打印结果：
+
+2015-03-21 12:04:11.163 test1[837:31981] blockData --0xbfff4ed8
+
+2015-03-21 12:04:11.163 test1[837:31981] blockData --0x7c2411c0
+
+2015-03-21 12:04:11.163 test1[837:31981] blockDataTest --c = 3
+
+`
+
+上面4段代码是分别对block中用到的局部变量、静态变量、全局变量、block变量的测试。测试结果显示：
+
+对于block中用到的外部变量，若是静态类型或者全局类型，block中该变量的地址没有发生变化。由于静态变量和全局变量其地址是固定的，因此block在定义的时候并没有复制该变量的值，而是直接从其所在内存中读出。
+
+再来看局部（本地）变量和block变量，在block中它们两个的地址都发生了变化，第一反应是block在定义的时候拷贝了这两种类型的变量（即开辟了新的内存空间），但是两者sum（）的结果却是不同的。事实上并不是都被拷贝了：
+
+对于局部变量，block在定义的时候复制了它，它在block中是作为常量使用的，其值不受外面的影响，因此在测试代码中，blockData的值始终为100。
+
+对于block变量，可以看到其地址发生了变化，但是blockData却受到外界影响。这是因为，blockData在定义变量本身的时候是位于stack上的，而在定义block的时候，该变量并不是被复制了一份，而是编译器将其转移到了heap上。
+代码验证:
+
+`
+    - (void)blockDataTest  
+    {  
+        __block int blockData = 100;  
+        NSLog(@"blockData -- %p",&blockData);  
+        int (^sum)() = ^(int a,int b){  
+            NSLog(@"blockData -- %p",&blockData);  
+            return blockData + a + b;  
+        };  
+        NSLog(@"blockData -- %p",&blockData);  
+        blockData = 0;  
+        int c = sum(1,2);  
+        NSLog(@"blockData -- %d",c);  
+    }  
+
+`
+`
+打印结果：
+
+2015-03-21 13:22:07.350 test1[1180:68166] blockData --0xbff47ed8
+
+2015-03-21 13:22:07.350 test1[1180:68166] blockData --0x7c452680
+
+2015-03-21 13:22:07.350 test1[1180:68166] blockData --0x7c452680
+
+2015-03-21 13:22:07.350test1[1180:68166] blockData – 3
+
+`
+
+可以看到block定义之后，blockData的地址就发生了变化。这样就能理解为何打印出来的blockData值是3了。
+
+###对象类型
+
+*对于静态对象变量和全局对象变量，其地址同样不是固定的。
+
+*对于局部（本地）对象变量，定义block的时候同样复制了(指针)变量，其在block中是作为(指针)常量使用的，不会受外界影响。
+
+*对于block对象变量，定义block的时候同样将变量从栈转移到了堆上，这一点用刚才的方法同样可以验证。因此block变量是受外界影响的，导致输出结果为空。
+
+
