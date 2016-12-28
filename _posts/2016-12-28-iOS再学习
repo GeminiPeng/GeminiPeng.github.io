@@ -1,0 +1,213 @@
+---
+layout: post
+title: "iOS学习"
+date: 2016-12-28 
+description: "一些iOS问题的学习和解答"
+tag: iOS 
+---   
+
+### 1.什么是arc? (arc是为了解决什么问题诞生)
+
+Automatic Reference Counting 自动引用计数 即ARC 是iOS5推出的,使用ARC解决了手动内存管理的麻烦,可以不用写retain,release和autorelease三个关键字.
+
+当ARC开启时,编译器将自动在代码合适的地方插入retain,release,autorelease.
+
+ARC的基本原则:只要摸个对象被__strong指针指向,那么它将不会被销毁.如果对象没有被任何strong指针指向,那么就将被销毁.__weak类型的指针也可以指向对象,但是并不会持有该对象.
+
+那么ARC是为了解决什么问题诞生的呢?
+
+MRC下内存管理的缺点:
+1.当我没要释放一堆内存的时候,首先要确定指向这个堆空间的指针被release了.
+2.释放指针指向的堆空间,首先要确定哪些指针指向同一个堆,这些指针只能释放一次.(MRC下谁创建谁释放,避免重复释放)
+3.模块化操作时,对象可能被多个模块创建和使用,不能确定最后由谁去释放.
+4.多线程操作时,不能确定哪个线程最后使用完毕
+
+
+------
+
+###2.请解释以下keywords的区别： assign vs weak,   __block vs __weak
+
+assign vs weak
+在MRC下使用retain修饰对象类型,使用assign实现基本类型.
+在ARC环境下,strong相当于retain,weak相当于assign,但是weak只能修饰对象类型,而assign使用于修饰基本类型
+__block vs __weak
+__block对象在block中是可以被修改,重新赋值的.
+__weak变量修饰符的对象,作用等同于定义为weak的property.不会导致循环引用.
+1.__block不管是ARC还是MRC模式下可以使用,可以修饰对象,还可以修饰基本数据类型.
+2.__weak只能在ARC模式下使用,也只能修饰对象,不能修饰基本数据类型.
+3.__block对象可以在block中被重新赋值,__weak不可以.
+4.__bloc对象在ARC下可能会导致循环引用,非ARC下会避免循环引用,__weak只在ARC下使用,可以避免循环引用.
+
+
+-----
+
+###3.__block在arc和非arc下含义一样吗？
+
+首先理解Block和__block变量的本质.
+Block === 栈上结构体实例
+block === 栈上block结构体实例
+
+截获__block变量对象
+在ARC中,block修饰的变量会引用到,并且计数+1
+在非ARC中,block修饰的变量的引用计数不变的.
+
+1.在MRC时代,block修饰,可以避免引用;ARC时代,block修饰,同样会引起循环引用;
+2.block不管是ARC还是MRC模式下都可以使用,可以修饰对象,还可以修饰基本数据类型;
+3.weak只能在ARC模式下使用,也只能修饰对象,不能修饰基本数据类型;
+4.block对象可以在block中被重新赋值,weak不可以;
+
+
+------
+
+###4.使用atomic一定是线程安全的吗？
+
+当使用atomic时,虽然对属性的读和写是原子性的,但是仍然可能出现线程错误:当线程A进行写操作,这时其他线程的读或者写操作会因为该操作而等待.当A线程的写操作结束后,B线程进行写操作,然后当A线程需要读操作时,却获得了在B线程中的值,这就破坏了线程安全,如果有线程C在A线程读操作前release了该属性,那么嗨会导致程序崩溃,所以仅仅使用atomic并不会使得线程安全,我们还要为线程添加lock来确保线程安全.
+
+
+------
+
+###5.描述一个你遇到过的retain cycle例子。
+
+retain cycle,翻译叫保留环.
+既然父对象持有子对象,而子对象随父对象释放而释放,如果两个对象相互为父对象怎么办?
+
+比如A和B两个对象,A持有B,B同时持有A,A只有B释放之后才能释放,同样B只有A释放后才能释放,双方都在等对方释放的时候,retain cycle就形成了,然后就永远都不会释放了,最终内存泄漏了.
+
+要么尽量保持子对象引用父对象的时候使用弱引用,也就是assign;
+要么及时地将造成retain cycle中的一个变量设置为nil,将环break掉.
+
+block中出现retain cycle,因为block本身也可以看做一个对象,也存在生命周期,也可以被持有.可以在A对象持有的block对象设置为nil,如此一来retain cycle被破坏掉,前提是不再需要再次回调block了
+
+在ARC中父子对象关系  可以把B对象中代表A对象定义成weak
+在Swift语言中，代表父类的变量是个弱变量的事实迫使我们将其定义为可选类型。不使用可选类型的另一种做法是将父类型对象声明为“unowned”
+
+GCD中dispatch_async (一般不会出现retain cycle)
+
+代理方法:代理是使用弱引用避免retain cycle的经典场景
+
+可以使用Instruments调试retain cycle
+
+
+------
+
+###6.+(void)load;   +(void)initialize；有什么用处？
+
+两个方法都可以进行一些类的初始化操作
+
++(void)load 方法只要加入了工程中,进行了编译,且.m中实现了这个方法,都会调用一次,值得注意的是没实现子类是不会调用的,就算父类实现了也不行.
+
++(void)initialize 在发送第一条消息给类的时候进行调用,跟load方法不同之处在于,比较迟,可实现懒加载,切父类.m实现了该方法,子类不实现也会调用父类.
+
+------
+
+###7.为什么其他语言里叫函数调用，Object-C里则叫给我对象发消息
+
+在java中,类和方法在编译期就绑定在一起
+在OC中,方法调用时向类发送消息,如[baby cry] 在运行时会转成objc_msgSend(baby,cry),向对象发送消息时根据isa指针找到类,在根据类的调度表查找方法,没找到方法择在父类中查找直至基类,如果始终没有好到返回nil.
+Objective-C 的 Runtime 铸就了它动态语言的特性。Objc Runtime使得C具有了面向对象能力，在程序运行时创建，检查，修改类、对象和它们的方法。可以使用runtime的一系列方法实现。
+
+runtime理解
+获取列表:
+方法调用:
+拦截调用:
+动态添加方法:
+关联对象:
+方法交换:
+1.方法交换对于我来说更像是实现一种思想的最佳技术：AOP面向切面编程。
+2.既然是切面，就一定不要忘记，交换完再调回自己。
+3.一定要保证只交换一次，否则就会很乱。
+4.最后，据说这个技术很危险，谨慎使用。
+
+
+------
+
+###8.什么是method swizzling?
+
+方法交换
+具体的做法，
+首先，用Categroy建立自己的方法。
+在+load方法中去实现方法交换的代码（load可以保证被调用，其他方法都不靠谱）
+
+`
+Method ori_Method =  class_getInstanceMethod([MYclass class], @selector(lastObject));  
+Method my_Method = class_getInstanceMethod([MYclass class], @selector(myLastObject));  
+method_exchangeImplementations(ori_Method, my_Method);
+
+`
+
+------
+
+###9.UIView和CALayer是啥关系？
+
+view是对layer的一种封装,对view的很多操作事实上是对layer的操作
+1.UIView可以响应事件,layer不可以.
+2.UIView是CALayer的delegate;
+3.UIView主要处理事件,CALayer负责绘制就更好
+4.每个UIView内部都有一个CALayer在背后提供内容的绘制和显示,并且UIView的尺寸样式都由内部的Layer所提供.两者都有树状层级结构,layer内部有SunLayer,View内部有SubViews,但是Layer比View多了个AnchorPoint
+
+
+------
+
+###10.如何高性能的给UIImageView加个圆角？
+
+UIBezierPath给图片进行切角处理
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
