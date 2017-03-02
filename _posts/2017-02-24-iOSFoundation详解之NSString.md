@@ -10,37 +10,31 @@ tag: iOS
 
 说到NSString大家一定不陌生了,我们进入Foundation中的NSString.h中首先三个枚举` NSStringCompareOptions `, ` NSStringEncoding ` 和 ` NSStringEncodingConversionOptions ` 这三个的作用我们在后面再说.然后就看到了今天的主角NSString了,首先他实现了` <NSCopying,NSMutableCopying,NSSecureCoding> ` 这么三个协议,这三个协议也会在本章的后面做解释.
 
-#####1.获取字符串长度
+##### 1.获取字符串长度
 
 `
-
 NSString = @"abcd"; 
 NSUInteger length = [str length]//str.length
-
 `
 
-#####2.根据索引获得单个字符
+##### 2.根据索引获得单个字符
 
 `
-
 NSString * str = @"www.baidu.com";
 //如果你给定的索引值超出了字符串的长度,就会导致异常崩溃
 //如果你给入的是一个负数那么获得的值就是一个乱码
 unichar c = [str characterAtIndex:2];//索引值从0开始
-
 `
 
-#####3.根据索引获得字符串的一个子串
+##### 3.根据索引获得字符串的一个子串
 
 `
-
 NSString * str = @"www.baidu.com";
 //substringFromIndex 从给定的索引开始(包含该索引位置)截取到字符串末尾
 NSString * tmpStr = [str substringFromIndex:3];
 
 //substringToIndex截取字符串到给定索引的位置结束,(不包括改索引位置);
 NSString : tmpStr = [str substringToIndex:3];
-
 `
 
 #####4.截取字符串的某一段
